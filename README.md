@@ -9,7 +9,9 @@ Benchmarks can be found [here](http://www.cs.rice.edu/CS/Verification/Projects/U
 ### Contributors ###
 
 (1) Kuldeep Meel (kuldeep@rice.edu)
+
 (2) Daniel Fremont (dfremont@berkeley.edu)
+
 (3) Mate Soos
 
 ### Contact ###
