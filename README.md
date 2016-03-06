@@ -6,6 +6,9 @@ For more details on hashing-based approach, please visit: http://www.cs.rice.edu
 Installation and usage instructions can be found in the "INSTALL" file in the "ugen2" folder.
 Benchmarks can be found [here](http://www.cs.rice.edu/CS/Verification/Projects/UniGen/Benchmarks/). Please see the appendix of our TACAS 2015 [paper](http://link.springer.com/chapter/10.1007/978-3-662-46681-0_25) for statistics on them.
 
+### Licensing ###
+Please see the file `LICENSE-MIT`.
+
 ### Contributors ###
 
 (1) Kuldeep Meel (kuldeep@rice.edu)
