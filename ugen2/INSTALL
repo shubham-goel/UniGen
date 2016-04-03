@@ -19,6 +19,8 @@ Running UniGen2
 ---------------
 
 You can run UniGen2 using the 'UniGen2.py' Python script in the directory above this one.
+While UniGen2 will work without doalarm and sharpSAT scripts, we typically observe performance improvements using the two binaries, so we advise you to compile 
+sharpSAT and doalarm. The source code is provided as is and the instructions are available in their corresponding README files
 For example, the command
 
 python UniGen2.py formula.cnf out
