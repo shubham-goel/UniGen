@@ -889,11 +889,11 @@ bool Main::AddHash(uint32_t numClaus, Solver& solver, vec<Lit> &assumptions, std
         activationVar = solver.newVar();
         assumptions.push(Lit(activationVar, true));
         lits.push(Lit(activationVar, false));
-        xorEqualFalse = (randomBits[(solver.independentSet.size() + 1) * i] == 1);
+        xorEqualFalse = (randomBits[(solver.independentSet.size() + 1) * i] == '1');
 
         for (uint32_t j = 0; j < solver.independentSet.size(); j++) {
 
-            if (randomBits[(solver.independentSet.size() + 1) * i + j] == '1') {
+            if (randomBits[(solver.independentSet.size() + 1) * i + j +1 ] == '1') {
                 lits.push(Lit(solver.independentSet[j], true));
             }
         }
