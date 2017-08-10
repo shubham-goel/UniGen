@@ -164,6 +164,11 @@ def main():
                 count = long(lines[0].strip())
                 logCount = math.log(count, 2)
                 startIteration = int(round(logCount + math.log(1.8, 2) - math.log(pivotUniGen, 2))) - 2
+                if (startIteration < 0):
+                    print "The number of solutions is only "+str(count)+"\n"
+                    print "The best technique is to just enumerate all the solutions and choose one"
+                    return;
+                    startIteration = 0
                 #print "Solution count estimate is %f * 2^%d" % (count / (2.0 ** int(logCount)), int(logCount))
         if failed:
             print "sharpSAT failed or timed out; using ApproxMC instead"

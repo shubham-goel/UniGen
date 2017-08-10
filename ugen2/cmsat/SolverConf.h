@@ -105,7 +105,7 @@ namespace CMSat {
         uint32_t origSeed;
         uint32_t samples;
         uint32_t callsPerSolver;
-        uint32_t startIteration;
+        int32_t startIteration;
         int32_t pivotApproxMC;
         uint32_t pivotUniGen;
         uint32_t samplesGen;

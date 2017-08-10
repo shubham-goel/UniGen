@@ -4,6 +4,7 @@ Copyright (c) 2007-2009, Niklas Sorensson
 Copyright (c) 2009-2012, Mate Soos
 Copyright (c) 2014, Supratik Chakraborty, Kuldeep S. Meel, Moshe Y. Vardi
 Copyright (c) 2015, Supratik Chakraborty, Daniel J. Fremont, Kuldeep S. Meel, Sanjit A. Seshia, Moshe Y. Vardi
+Copyright (c) 2016-2017, Kuldeep S. Meel
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
 associated documentation files (the "Software"), to deal in the Software without restriction,
 including without limitation the rights to use, copy, modify, merge, publish, distribute,
@@ -1350,6 +1351,11 @@ int Main::singleThreadSolve() {
         }
         conf.startIteration = round(solCount.hashCount + log2(solCount.cellSolCount) + 
             log2(1.8) - log2(conf.pivotUniGen))-2;
+        if (conf.startIteration < 0){
+           printf("The number of solutions is too small. The best technique is just to enumerate and sample one.\n");
+           return 0;
+          //conf.startIteration = 0;
+        }
     }
     else
         ;//printf("Using manually-specified startIteration\n");
@@ -1364,7 +1370,7 @@ int Main::singleThreadSolve() {
     uint32_t numCallsInOneLoop = 0;
     if(conf.callsPerSolver == 0)
     {
-        numCallsInOneLoop = std::min(solver.nVars()/(conf.startIteration*14), callsNeeded/numThreads);
+        numCallsInOneLoop = std::min(solver.nVars()/(1+conf.startIteration*14), callsNeeded/numThreads);
         if (numCallsInOneLoop == 0){
             numCallsInOneLoop = 1;
         }
