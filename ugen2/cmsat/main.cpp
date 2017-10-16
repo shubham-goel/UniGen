@@ -39,6 +39,11 @@ a correct state, then dump these and quit normally. This interrupt hander
 is used to achieve this
  */
 
+void SIGINT_handler(int) {
+#pragma omp critical
+  exit(1);
+}
+
 int main(int argc, char** argv) {
     Main main(argc, argv);
     main.parseCommandLine();

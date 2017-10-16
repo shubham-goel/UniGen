@@ -137,10 +137,6 @@ void start_timer(int num) {
     timerSetFirstTime[threadNum] = false;
     timer_settime(mytimer[threadNum], 0, &value, NULL);
 }
-void SIGINT_handler(int) {
-#pragma omp critical
-  exit(1);
-}
 void SIGALARM_handler(int sig, siginfo_t *si, void *uc) {
 #pragma omp critical
     {
