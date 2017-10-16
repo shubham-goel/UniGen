@@ -10,9 +10,9 @@ pkginclude_HEADERS = BitArray.h Clause.h CSet.h MatrixFinder.h Solver.h Subsumer
 
 noinst_HEADERS = msvc/stdint.h main.h
 
-lib_LTLIBRARIES = libcryptominisat.la
-libcryptominisat_la_LDFLAGS = -release $(VERSION) -no-undefined
-libcryptominisat_la_SOURCES = \
+lib_LTLIBRARIES = libunigen.la
+libunigen_la_LDFLAGS = -release $(VERSION) -no-undefined
+libunigen_la_SOURCES = \
 	ClauseCleaner.cpp FailedLitSearcher.cpp \
 	VarReplacer.cpp \
 	MatrixFinder.cpp \
@@ -25,7 +25,7 @@ libcryptominisat_la_SOURCES = \
 	OnlyNonLearntBins.cpp SolverConf.cpp DataSync.cpp \
 	BothCache.cpp Main.cpp
 
-bin_PROGRAMS = cryptominisat
-cryptominisat_LDADD = libcryptominisat.la -lrt
-cryptominisat_LDFLAGS = -static -lz $(OPENMP_CXXFLAGS) $(LIBS)
-cryptominisat_SOURCES = main.cpp
+bin_PROGRAMS = unigen
+unigen_LDADD = libunigen.la -lrt
+unigen_LDFLAGS = -static -lz $(OPENMP_CXXFLAGS) $(LIBS)
+unigen_SOURCES = main.cpp
