@@ -5,10 +5,10 @@ pkginclude_HEADERS = BitArray.h Clause.h CSet.h MatrixFinder.h Solver.h Subsumer
 	time_mem.h XorFinder.h ClauseAllocator.h CompleteDetachReattacher.h DoublePackedRow.h Gaussian.h PackedMatrix.h \
 	PropBy.h StateSaver.h UselessBinRemover.h  XorSubsumer.h ClauseCleaner.h constants.h FailedLitSearcher.h \
 	PackedRow.h RestartTypeChooser.h StreamBuffer.h VarReplacer.h XSet.h BothCache.h SolverConf.h \
-	SCCFinder.h SharedData.h ClauseVivifier.h DataSync.h Alg.h  Heap.h  MersenneTwister.h  Vec.h
+	SCCFinder.h SharedData.h ClauseVivifier.h DataSync.h Alg.h  Heap.h  MersenneTwister.h  Vec.h Main.h
 
 
-noinst_HEADERS = msvc/stdint.h Main.h
+noinst_HEADERS = msvc/stdint.h main.h
 
 lib_LTLIBRARIES = libcryptominisat.la
 libcryptominisat_la_LDFLAGS = -release $(VERSION) -no-undefined
@@ -23,9 +23,9 @@ libcryptominisat_la_SOURCES = \
 	UselessBinRemover.cpp SCCFinder.cpp ClauseVivifier.cpp \
 	CompleteDetachReattacher.cpp DimacsParser.cpp \
 	OnlyNonLearntBins.cpp SolverConf.cpp DataSync.cpp \
-	BothCache.cpp
+	BothCache.cpp Main.cpp
 
 bin_PROGRAMS = cryptominisat
 cryptominisat_LDADD = libcryptominisat.la -lrt
 cryptominisat_LDFLAGS = -static -lz $(OPENMP_CXXFLAGS) $(LIBS)
-cryptominisat_SOURCES = Main.cpp
+cryptominisat_SOURCES = main.cpp

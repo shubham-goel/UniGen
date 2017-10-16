@@ -70,6 +70,20 @@ numThreads(0)
 }
 
 
+bool printSolutions(map<std::string, uint32_t>&SolMap, FILE* res){
+    int i;
+    for (map<std::string, uint32_t>:: iterator it = SolMap.begin();
+                                    it != SolMap.end(); it++)
+    {
+        uint32_t counts = it->second;
+        fprintf(res, "%s:%d\n ", it->first.c_str(), counts);
+    }
+            
+    fflush(res);
+     
+    return true;
+}
+
 double findMean(std::list<int> numList) {
     double sum = 0;
     for (std::list<int>::iterator it = numList.begin(); it != numList.end(); it++) {
@@ -941,8 +955,8 @@ int32_t Main::BoundedSATCount(uint32_t maxSolutions, Solver &solver, vec<Lit> &a
     while (current_nr_of_solutions < maxSolutions && ret == l_True) {
 
         ret = solver.solve(allSATAssumptions);
-        current_nr_of_solutions++;
         if (ret == l_True && current_nr_of_solutions < maxSolutions) {
+            current_nr_of_solutions++;
             vec<Lit> lits;
             lits.push(Lit(activationVar, false));
             for (uint32_t j = 0; j < solver.independentSet.size(); j++) {
@@ -959,7 +973,7 @@ int32_t Main::BoundedSATCount(uint32_t maxSolutions, Solver &solver, vec<Lit> &a
     solver.addClause(cls_that_removes);
     if (ret == l_Undef){
         solver.needToInterrupt = false;
-        return -1*current_nr_of_solutions;
+        return -1*current_nr_of_solutions - 1;
     }
     return current_nr_of_solutions;
 }
@@ -1019,8 +1033,8 @@ lbool Main::BoundedSAT(uint32_t maxSolutions, uint32_t minSolutions, Solver &sol
         for (uint32_t i = 0; i < numSolutionsToReturn; i++) {
             vec<lbool> model = modelsSet.at(modelIndices.at(i));
             string solution ("v");
-            for (uint32_t j = 0; j < solver.independentSet.size(); j++) {
-                var = solver.independentSet[j];
+            for (uint32_t j = 0; j < solver.returnSet.size(); j++) {
+                var = solver.returnSet[j];
                 if (model[var] != l_Undef) {
                     if (model[var] != l_True) {
                         solution += "-";
@@ -1066,13 +1080,13 @@ SATCount Main::ApproxMC(Solver &solver, vector<FILE *> *resLog, std::mt19937 &ra
 
             myTime = totalTime() - myTime;
             //printf("%f\n", myTime);
-            //printf("%d %d\n",currentNumSolutions,conf.pivotApproxMC);
+            printf("currentNumSolutions: %d %d\n",currentNumSolutions,conf.pivotApproxMC);
             if (conf.shouldLog) {
                 fprintf((*resLog)[0], "ApproxMC:%d:%d:%f:%d:%d\n", j, hashCount, myTime,
                     (currentNumSolutions == (int32_t)(conf.pivotApproxMC + 1)),currentNumSolutions);
                 fflush((*resLog)[0]);
             }
-            if (currentNumSolutions <= 0){
+            if (currentNumSolutions < 0){
                 assumptions.clear();
                 if (repeatTry < 2){     /* Retry up to twice more */
                     AddHash(hashCount,solver,assumptions,randomEngine);
@@ -1193,6 +1207,17 @@ uint32_t Main::UniGen(uint32_t samples, Solver &solver,
             if (ret == l_True)      /* Number of solutions in correct range */
             {
                 *lastSuccessfulHashOffset = currentHashOffset;
+
+                #pragma omp critical 
+                {
+                    // printSolutions(solutionMap,res);
+                    for (auto it : solutionMap) {
+                        fprintf(res, "%s:%d\n ", it.first.c_str(), it.second);
+                    }
+                }
+                fflush(res);
+                solutionMap.clear();
+
                 break;
             }
             else    /* Number of solutions too small or too large */
@@ -1344,7 +1369,7 @@ int Main::singleThreadSolve() {
             return 0;
         }
         printf("\n");
-        //printf("Solution count estimate is %d * 2^%d\n", solCount.cellSolCount, solCount.hashCount);
+        printf("Solution count estimate is %d * 2^%d\n", solCount.cellSolCount, solCount.hashCount);
         if (solCount.hashCount == 0 && solCount.cellSolCount == 0){
             printf("The input formula is unsatisfiable.");
             return 0;
@@ -1452,6 +1477,8 @@ int Main::singleThreadSolve() {
             printf("\n");
         }
     }
+    // fprintf(res, "#################FINAL###################\n");
+    // fflush(res);
     if (printResult)
         printSolutions(res);
 
@@ -1488,40 +1515,4 @@ int Main::singleThreadSolve() {
     // printResultFunc(solver, ret, res, current_nr_of_solutions == 1);
 
     return correctReturnValue(ret);
-}
-
-/**
-@brief For correctly and gracefully exiting
-
-It can happen that the user requests a dump of the learnt clauses. In this case,
-the program must wait until it gets to a state where the learnt clauses are in
-a correct state, then dump these and quit normally. This interrupt hander
-is used to achieve this
- */
-
-int main(int argc, char** argv) {
-    Main main(argc, argv);
-    main.parseCommandLine();
-    signal(SIGINT, SIGINT_handler);
-    //signal(SIGALRM, SIGALARM_handler);
-    try{
-        return main.singleThreadSolve();
-
-    }
-
-    catch(std::bad_alloc) {
-        std::cerr << "Memory manager cannot handle the load. Sorry. Exiting." << std::endl;
-        exit(-1);
-    }
-
-    catch(std::out_of_range oor) {
-        std::cerr << oor.what() << std::endl;
-        exit(-1);
-    }
-
-    catch(CMSat::DimacsParseError dpe) {
-        std::cerr << "PARSE ERROR!" << dpe.what() << std::endl;
-        exit(3);
-    }
-    return 0;
 }

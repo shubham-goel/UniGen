@@ -664,6 +664,32 @@ delete independentSetTrack;
 }
 template bool Solver::addIndependentSet(vec<Var> & ps);
 
+/***
+ Adds the return set, should be called only once
+
+ */
+template<class T>
+bool Solver::addReturnSet(T & ps) {
+    origVars = nVars();
+    if (ps.size() == 0) {
+        for (Var i = 0; i != nVars(); i++) {
+            returnSet.push(i);
+        }
+        return true;
+    }
+
+    vector<lbool> *returnSetTrack = new vector<lbool> (assigns.size(), l_Undef);
+    for (uint32_t i = 0; i != ps.size(); i++) {
+        if ((*returnSetTrack)[ps[i]] == l_Undef) {
+            returnSet.push(ps[i]);
+            (*returnSetTrack)[ps[i]] = l_True;
+        }
+    }
+delete returnSetTrack;
+    return ok;
+}
+template bool Solver::addReturnSet(vec<Var> & ps);
+
 /**
 @brief Attaches an xor clause to the watchlists
 

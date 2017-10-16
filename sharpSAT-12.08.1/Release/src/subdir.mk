@@ -32,7 +32,7 @@ CPP_DEPS += \
 src/%.o: ../src/%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
-	g++  -L/home/kgm2/Experimentation/Scripts/INSTALL/gmp/lib/ -I/home/kgm2/Experimentation/Scripts/INSTALL/gmp/include/ -O3 -g -pg -Wall -std=c++0x -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
+	g++  -L/home/shubham/Downloads/gmp-6.1.2/ -I/home/shubham/Downloads/gmp-6.1.2/ -O3 -g -pg -Wall -std=c++0x -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

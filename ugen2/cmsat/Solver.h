@@ -142,6 +142,8 @@ namespace CMSat {
         bool addXorClause(T& ps, bool xorEqualFalse) throw (std::out_of_range); // Add a xor-clause to the solver. NOTE! 'ps' may be shrunk by this method!
         template<class T>
         bool addIndependentSet(T & ps);
+        template<class T>
+        bool addReturnSet(T & ps);
 
         // Solving:
         //
@@ -236,6 +238,7 @@ namespace CMSat {
          * Independent Set
          */
         vec<Var> independentSet; ///< Set of independent variables
+        vec<Var> returnSet; ///< Set of independent variables
 
 
     protected:

@@ -72,6 +72,7 @@ namespace CMSat {
         std::string stringify(uint32_t x);
         void parseSolveComment(StreamBuffer& in);
         void parseIndependentSet(StreamBuffer & in);
+        void parseReturnSet(StreamBuffer & in);
 
 
         size_t lineNum;
@@ -84,6 +85,7 @@ namespace CMSat {
         uint32_t debugLibPart; ///<printing partial solutions to debugLibPart1..N.output when "debugLib" is set to TRUE
         vec<Lit> lits; ///<To reduce temporary creation overhead
         vec<Var> varVector; ///< To reduce temporary creation overhead for independent/dependent sets
+        vec<Var> retVector; ///< To reduce temporary creation overhead for independent/dependent sets
         uint32_t numLearntClauses; ///<Number of learnt non-xor clauses added
         uint32_t numNormClauses; ///<Number of non-learnt, non-xor claues added
         uint32_t numXorClauses; ///<Number of non-learnt xor clauses added

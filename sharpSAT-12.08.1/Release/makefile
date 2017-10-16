@@ -45,7 +45,8 @@ all: sharpSAT
 sharpSAT: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
-	g++ -L/home/kgm2/Experimentation/Scripts/INSTALL/gmp/lib/ -I/home/kgm2/Experimentation/Scripts/INSTALL/gmp/include/ -L/usr/lib/ -g -pg -o "sharpSAT" $(OBJS) $(USER_OBJS) $(LIBS)
+	g++ -L/home/shubham/Downloads/gmp-6.1.2/ -I/home/shubham/Downloads/gmp-6.1.2/ -L/usr/lib/ -L/usr/local/lib -g -pg -o "sharpSAT" $(OBJS) $(USER_OBJS) $(LIBS)
+	# g++ -L/home/kgm2/Experimentation/Scripts/INSTALL/gmp/lib/ -I/home/kgm2/Experimentation/Scripts/INSTALL/gmp/include/ -L/usr/lib/ -g -pg -o "sharpSAT" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
