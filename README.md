@@ -11,11 +11,11 @@ Please see the file `LICENSE-MIT`.
 
 ### Contributors ###
 
-(1) Kuldeep Meel (kuldeep@rice.edu)
+(1) Kuldeep Meel (meel@comp.nus.edu.sg)
 
 (2) Daniel Fremont (dfremont@berkeley.edu)
 
 (3) Mate Soos
 
 ### Contact ###
-* Kuldeep Meel (kuldeep@rice.edu)
+* Kuldeep Meel (meel@comp.nus.edu.sg)

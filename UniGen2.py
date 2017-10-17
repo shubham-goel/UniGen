@@ -162,6 +162,9 @@ def main():
             if (lines[1].strip() == "END"):
                 failed = False
                 count = long(lines[0].strip())
+                if (count == 0):
+                    print "Unsatisfiable formula!"
+                    return;
                 logCount = math.log(count, 2)
                 startIteration = int(round(logCount + math.log(1.8, 2) - math.log(pivotUniGen, 2))) - 2
                 if (startIteration < 0):
