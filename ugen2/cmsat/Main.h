@@ -36,13 +36,24 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 #include "cmsat/Solver.h"
 #include "cmsat/SharedData.h"
 #include "cmsat/DimacsParser.h"
+#include <pthread.h>
+
 namespace CMSat {
 
     using std::string;
+    using std::map;
+    extern pthread_cond_t lilCondVar;
+    extern pthread_mutex_t mu_lock;
+    extern pthread_cond_t statCondVar;
+    extern pthread_mutex_t stat_lock;
 
     struct SATCount {
         uint32_t hashCount;
         uint32_t cellSolCount;
+    };
+
+    enum initialStatus {
+        udef, sat, unsat, tooLittle
     };
 
     class Main {
@@ -56,6 +67,10 @@ namespace CMSat {
         int multiThreadSolve();
 
         int numThreads;
+        static std::map< std::string, uint32_t> fetchSolutionMap(int minimum);
+        static int getSolutionMapSize();
+        static initialStatus initStat;
+        static bool unigenRunning;
 
     private:
 
@@ -106,6 +121,7 @@ namespace CMSat {
 
         time_t  startTime;
         std::map< std::string, std::vector<uint32_t>> globalSolutionMap;
+        static std::map< std::string, uint32_t> storedCexMap;
     };
 
 }
