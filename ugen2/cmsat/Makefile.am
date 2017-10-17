@@ -11,7 +11,7 @@ pkginclude_HEADERS = BitArray.h Clause.h CSet.h MatrixFinder.h Solver.h Subsumer
 noinst_HEADERS = msvc/stdint.h main.h
 
 lib_LTLIBRARIES = libunigen.la
-libunigen_la_LDFLAGS = -release $(VERSION) -no-undefined
+libunigen_la_LDFLAGS = -release -lpthread $(VERSION) -no-undefined
 libunigen_la_SOURCES = \
 	ClauseCleaner.cpp FailedLitSearcher.cpp \
 	VarReplacer.cpp \
@@ -27,5 +27,5 @@ libunigen_la_SOURCES = \
 
 bin_PROGRAMS = unigen
 unigen_LDADD = libunigen.la -lrt
-unigen_LDFLAGS = -static -lz $(OPENMP_CXXFLAGS) $(LIBS)
+unigen_LDFLAGS = -static -lz -lpthread $(OPENMP_CXXFLAGS) $(LIBS)
 unigen_SOURCES = main.cpp

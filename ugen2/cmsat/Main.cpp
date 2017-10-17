@@ -56,6 +56,14 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 
 using namespace CMSat;
 
+std::map< std::string, uint32_t> Main::storedCexMap;
+initialStatus Main::initStat = initialStatus::udef;
+pthread_cond_t CMSat::lilCondVar;
+pthread_mutex_t CMSat::mu_lock;
+pthread_cond_t CMSat::statCondVar;
+pthread_mutex_t CMSat::stat_lock;
+bool Main::unigenRunning = false;
+
 Main::Main(int _argc, char** _argv) :
 numThreads(0)
 , grouping(false)
@@ -68,7 +76,6 @@ numThreads(0)
 , argc(_argc)
 , argv(_argv) {
 }
-
 
 bool printSolutions(map<std::string, uint32_t>&SolMap, FILE* res){
     int i;
@@ -1139,6 +1146,7 @@ uint32_t Main::UniGen(uint32_t samples, Solver &solver,
     #endif
     int repeatTry = 0;
     for (i = 0; i < samples; i++) {
+        // std::cout << "threadNum: " << threadNum << " i: " << i << std::endl;
         sampleCounter ++;
         ret = l_False;
 
@@ -1203,15 +1211,21 @@ uint32_t Main::UniGen(uint32_t samples, Solver &solver,
             if (ret == l_True)      /* Number of solutions in correct range */
             {
                 *lastSuccessfulHashOffset = currentHashOffset;
-
-                #pragma omp critical 
+                // int newVar = omp_get_thread_num();
+                // std::cout << "#pragma " << newVar << ": going to lock" << std::endl;
+                /* Aggregate thread-specific solution counts */
+                #pragma omp critical
                 {
-                    // printSolutions(solutionMap,res);
+                    pthread_mutex_lock(&mu_lock);
+                    // std::cout << "#pragma " << newVar << ": locked" << std::endl;
                     for (auto it : solutionMap) {
-                        fprintf(res, "%s:%d\n ", it.first.c_str(), it.second);
+                        storedCexMap[it.first] = it.second;
                     }
+                    // std::cout << "#pragma " << newVar << ": signalling" << std::endl;
+                    pthread_cond_signal(&lilCondVar);
+                    // std::cout << "#pragma " << newVar << ": unlocked" << std::endl;
+                    pthread_mutex_unlock(&mu_lock);
                 }
-                fflush(res);
                 solutionMap.clear();
 
                 break;
@@ -1368,12 +1382,20 @@ int Main::singleThreadSolve() {
         printf("Solution count estimate is %d * 2^%d\n", solCount.cellSolCount, solCount.hashCount);
         if (solCount.hashCount == 0 && solCount.cellSolCount == 0){
             printf("The input formula is unsatisfiable.");
+            pthread_mutex_lock(&stat_lock);
+            initStat = initialStatus::unsat;
+            pthread_cond_signal(&statCondVar);
+            pthread_mutex_unlock(&stat_lock);
             return 0;
         }
         conf.startIteration = round(solCount.hashCount + log2(solCount.cellSolCount) + 
             log2(1.8) - log2(conf.pivotUniGen))-2;
         if (conf.startIteration < 0){
            printf("The number of solutions is too small. The best technique is just to enumerate and sample one.\n");
+           pthread_mutex_lock(&stat_lock);
+           initStat = initialStatus::tooLittle;
+           pthread_cond_signal(&statCondVar);
+           pthread_mutex_unlock(&stat_lock);
            return 0;
           //conf.startIteration = 0;
         }
@@ -1410,6 +1432,10 @@ int Main::singleThreadSolve() {
     std::map<std::string, uint32_t> threadSolutionMap;
     double allThreadsTime = 0;
     uint32_t allThreadsSampleCount = 0;
+    pthread_mutex_lock(&stat_lock);
+    initStat = initialStatus::sat;
+    pthread_cond_signal(&statCondVar);
+    pthread_mutex_unlock(&stat_lock);
     printf("Launching %d sampling thread(s)\n", numThreads);
     #pragma omp parallel private(timedOut) firstprivate(threadSolutionMap,sampleCounter)
     {
@@ -1509,6 +1535,32 @@ int Main::singleThreadSolve() {
     if (conf.verbosity >= 1) solver.printStats();
 
     // printResultFunc(solver, ret, res, current_nr_of_solutions == 1);
-
     return correctReturnValue(ret);
+}
+
+std::map< std::string, uint32_t> Main::fetchSolutionMap(int minimum) {
+    std::map< std::string, uint32_t> returnSolutionMap;
+    // std::cout << "fetchSolutionMap: going to lock " << std::endl;
+    pthread_mutex_lock(&mu_lock);
+    // std::cout << "fetchSolutionMap: Locked" << std::endl;
+    // std::cout << "fetchSolutionMap: minimum: " << minimum << " size: " << storedCexMap.size() << " and running " << unigenRunning << std::endl;
+    while(CMSat::Main::storedCexMap.size() < minimum and CMSat::Main::unigenRunning) {
+        // std::cout << "fetchSolutionMap: minimum: " << minimum << " size: " << storedCexMap.size() << " and running " << unigenRunning << std::endl;
+        // std::cout << "fetchSolutionMap: gonna sleeeep" << std::endl;
+        pthread_cond_wait(&lilCondVar, &mu_lock);
+        // std::cout << "fetchSolutionMap: Locked again" << std::endl;
+    }
+    returnSolutionMap = Main::storedCexMap;
+    storedCexMap.clear();
+    // std::cout << "fetchSolutionMap: unlocking " << std::endl;
+    pthread_mutex_unlock(&mu_lock);
+    return returnSolutionMap;
+}
+
+int Main::getSolutionMapSize() {
+    int size = 0;
+    pthread_mutex_lock(&mu_lock);
+    size = CMSat::Main::storedCexMap.size();
+    pthread_mutex_unlock(&mu_lock);
+    return size;
 }
