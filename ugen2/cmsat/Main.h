@@ -71,6 +71,7 @@ namespace CMSat {
         static int getSolutionMapSize();
         static initialStatus initStat;
         static bool unigenRunning;
+        static bool prematureKill;
 
     private:
 

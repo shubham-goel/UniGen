@@ -63,6 +63,7 @@ pthread_mutex_t CMSat::mu_lock;
 pthread_cond_t CMSat::statCondVar;
 pthread_mutex_t CMSat::stat_lock;
 bool Main::unigenRunning = false;
+bool Main::prematureKill = false;
 
 Main::Main(int _argc, char** _argv) :
 numThreads(0)
@@ -1227,6 +1228,9 @@ uint32_t Main::UniGen(uint32_t samples, Solver &solver,
                     pthread_mutex_unlock(&mu_lock);
                 }
                 solutionMap.clear();
+
+                if(prematureKill)
+                    return sampleCounter;
 
                 break;
             }
