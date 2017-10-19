@@ -1147,7 +1147,6 @@ uint32_t Main::UniGen(uint32_t samples, Solver &solver,
     #endif
     int repeatTry = 0;
     for (i = 0; i < samples; i++) {
-        // std::cout << "threadNum: " << threadNum << " i: " << i << std::endl;
         sampleCounter ++;
         ret = l_False;
 
@@ -1472,7 +1471,7 @@ int Main::singleThreadSolve() {
         #pragma omp for schedule(dynamic) nowait
         for (uint32_t i = 0;i<numCallLoops;i++)
         {
-            if (!timedOut)
+            if (!timedOut and Main::prematureKill == false)
             {
                 sampleCounter = singleThreadUniGenCall(numCallsInOneLoop,res,resLog,sampleCounter,threadSolutionMap,randomEngine,&lastSuccessfulHashOffset,threadStartTime);
                 if ((totalTime() - threadStartTime) > conf.totalTimeout - 3000)
