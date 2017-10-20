@@ -72,6 +72,9 @@ namespace CMSat {
         static initialStatus initStat;
         static bool unigenRunning;
         static bool prematureKill;
+        static bool firstFetch;
+        static double totalDeadTime;
+        static std::chrono::time_point<std::chrono::steady_clock> unigenCalledAt;
 
     private:
 

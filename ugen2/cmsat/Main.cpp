@@ -64,6 +64,9 @@ pthread_cond_t CMSat::statCondVar;
 pthread_mutex_t CMSat::stat_lock;
 bool Main::unigenRunning = false;
 bool Main::prematureKill = false;
+bool Main::firstFetch    = true;
+double Main::totalDeadTime = 0;
+std::chrono::time_point<std::chrono::steady_clock> Main::unigenCalledAt = std::chrono::steady_clock::now();
 
 Main::Main(int _argc, char** _argv) :
 numThreads(0)
@@ -1552,6 +1555,13 @@ std::map< std::string, uint32_t> Main::fetchSolutionMap(int minimum) {
         // std::cout << "fetchSolutionMap: gonna sleeeep" << std::endl;
         pthread_cond_wait(&lilCondVar, &mu_lock);
         // std::cout << "fetchSolutionMap: Locked again" << std::endl;
+    }
+    if(Main::firstFetch) {
+        Main::firstFetch = false;
+        auto endTime = std::chrono::steady_clock::now();
+        double currDeadTime = std::chrono::duration_cast<std::chrono::microseconds>(endTime - Main::unigenCalledAt).count()/1000000.0;
+        Main::totalDeadTime += currDeadTime;
+        std::cout << "Dead Time: " << currDeadTime << std::endl;
     }
     returnSolutionMap = Main::storedCexMap;
     storedCexMap.clear();
